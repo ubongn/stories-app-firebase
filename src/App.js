@@ -1,7 +1,18 @@
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import VideoCard from "./components/VideoCard";
+import { db } from "./firebase";
 
 function App() {
+  const [videos, setVideos] = useState([]);
+
+  useEffect( () => {
+    db.collection('videos').onSnapshot(snapshot => {
+      setVideos(snapshot.docs.map(doc => doc.data()))
+    })
+
+  }, [videos])
+
   return (
     <div className="app">
       <div className="app__top">
@@ -9,22 +20,16 @@ function App() {
         <h1>Shorts</h1>
       </div>
       <div className="app__videos">
-        <VideoCard
-          url="https://res.cloudinary.com/dxkxvfo2o/video/upload/v1608169738/video1_cvrjfm.mp4"
-          channel="NUG"
-          avatarSrc="https://pbs.twimg.com/profile_images/1020939891457241088/fcbu814K_400x400.jpg"
-          song="I am a Windows PC"
-          likes={950}
-          shares={200}
-        />
-        <VideoCard
-          url="https://res.cloudinary.com/dxkxvfo2o/video/upload/v1608169739/video2_mecbdo.mp4"
-          channel="Ubong"
-          avatarSrc="https://pbs.twimg.com/profile_images/1020939891457241088/fcbu814K_400x400.jpg"
-          song="I am a good PC"
-          likes={850}
-          shares={150}
-        />
+        {videos.map(({ url, channel, avatarSrc, song, likes, shares }) => (
+          <VideoCard
+            url={url}
+            channel={channel}
+            avatarSrc={avatarSrc}
+            song={song}
+            likes={likes}
+            shares={shares}
+          />
+        ))}
       </div>
     </div>
   );
